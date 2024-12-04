@@ -420,6 +420,8 @@ class FileStore(AbstractStore):
                 databricks_pb2.RESOURCE_DOES_NOT_EXIST,
             )
         meta = FileStore._read_yaml(experiment_dir, FileStore.META_DATA_FILE_NAME)
+        if meta is None:
+            return None
         meta["tags"] = self.get_all_experiment_tags(experiment_id)
         experiment = _read_persisted_experiment_dict(meta)
         if experiment_id != experiment.experiment_id:
@@ -586,6 +588,8 @@ class FileStore(AbstractStore):
         for deleted_run in deleted_runs:
             _, run_dir = self._find_run_root(deleted_run.info.run_uuid)
             meta = read_yaml(run_dir, FileStore.META_DATA_FILE_NAME)
+            if meta is None:
+                continue
             if "deleted_time" not in meta or current_time - int(meta["deleted_time"]) >= older_than:
                 deleted_run_ids.append(deleted_run.info.run_uuid)
 
@@ -729,6 +733,8 @@ class FileStore(AbstractStore):
 
     def _get_run_info_from_dir(self, run_dir):
         meta = FileStore._read_yaml(run_dir, FileStore.META_DATA_FILE_NAME)
+        if meta is None:
+            return None
         return _read_persisted_run_info_dict(meta)
 
     def _get_run_files(self, run_info, resource_type):
