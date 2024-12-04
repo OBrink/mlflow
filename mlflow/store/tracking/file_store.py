@@ -724,6 +724,8 @@ class FileStore(AbstractStore):
                 f"Run '{run_uuid}' not found", databricks_pb2.RESOURCE_DOES_NOT_EXIST
             )
         run_info = self._get_run_info_from_dir(run_dir)
+        if run_info is None:
+            return None
         if run_info.experiment_id != exp_id:
             raise MlflowException(
                 f"Run '{run_uuid}' metadata is in invalid state.",
