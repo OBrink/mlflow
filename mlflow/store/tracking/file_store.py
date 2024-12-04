@@ -929,6 +929,13 @@ class FileStore(AbstractStore):
             try:
                 # trap and warn known issues, will raise unexpected exceptions to caller
                 run_info = self._get_run_info_from_dir(r_dir)
+                if run_info is None:
+                    logging.warning(
+                        "Run from directory '%s' is corrupt and will be ignored.",
+                        str(r_dir),
+                        exc_info=True,
+                    )
+                    continue
                 if run_info.experiment_id != experiment_id:
                     logging.warning(
                         "Wrong experiment ID (%s) recorded for run '%s'. "
@@ -1307,6 +1314,8 @@ class FileStore(AbstractStore):
             )
             for run_dir in run_dirs:
                 run_info = self._get_run_info_from_dir(run_dir)
+                if run_info is None:
+                    continue
                 run_inputs = self._get_all_inputs(run_info)
                 for dataset_input in run_inputs.dataset_inputs:
                     context = None
